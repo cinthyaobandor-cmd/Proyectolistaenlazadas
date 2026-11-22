@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 
 namespace WindowsFormsApp3
 {
     internal class NodoImagen
     {
-        // El 'Data' es un objeto Image de Windows Forms
+        public string RutaArchivo { get; set; } // Propiedad para almacenar la ruta del archivo
         public Image Imagen { get; set; }
         public NodoImagen Siguiente { get; set; }
+        public NodoImagen Anterior { get; set; } // Puntero hacia atrás añadido
 
         public NodoImagen(string ruta)
         {
-            // Carga la imagen desde la ruta del archivo
             Imagen = Image.FromFile(ruta);
             Siguiente = null;
+            Anterior = null;
         }
     }
 }

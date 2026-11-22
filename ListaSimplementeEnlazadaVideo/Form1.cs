@@ -102,5 +102,11 @@ namespace ListaSimplementeEnlazadaVideo
             galeriaCanales.Reiniciar();
             ReproducirCanal(galeriaCanales.ObtenerCanalActual());
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            NodoCanal canalAnterior = galeriaCanales.ObtenerCanalAnterior();
+            ReproducirCanal(canalAnterior);
+        }
     }
 }

@@ -23,17 +23,18 @@ namespace ListaSimplementeEnlazadaVideo
             NodoCanal nuevoNodo = new NodoCanal(nombre, url);
             if (Cabeza == null)
             {
+                nuevoNodo.Siguiente = nuevoNodo;
+                nuevoNodo.Anterior  = nuevoNodo; // El nodo apunta a sí mismo como anterior
+
                 Cabeza = nuevoNodo;
                 actual = Cabeza;
                 return;
             }
-
-            NodoCanal temp = Cabeza;
-            while (temp.Siguiente != null)
-            {
-                temp = temp.Siguiente;
-            }
-            temp.Siguiente = nuevoNodo;
+            NodoCanal ultimo = Cabeza.Anterior; // El último nodo es el anterior de la cabeza
+            ultimo.Siguiente = nuevoNodo;
+            nuevoNodo.Anterior = ultimo;
+            nuevoNodo.Siguiente = Cabeza;
+            Cabeza.Anterior = nuevoNodo; // Actualiza el nodo anterior de la cabeza
         }
 
         // Obtiene el nodo actual (para la reproducción inicial o después de reiniciar)
@@ -45,12 +46,23 @@ namespace ListaSimplementeEnlazadaVideo
         // Avanza al siguiente canal y lo devuelve
         public NodoCanal ObtenerSiguienteCanal()
         {
-            // Si hay un siguiente nodo, avanza el puntero 'actual'
-            if (actual?.Siguiente != null)
+            // Si la lista no esta vacía, avanza al siguiente 
+            if (actual!= null)
             {
                 actual = actual.Siguiente;
             }
-            // Si no hay siguiente, se queda en el último nodo
+            // Si la lista es circular, del ultimo pasa al primero 
+            return actual;
+        }
+        public NodoCanal ObtenerCanalAnterior()
+   
+        {
+            // Si la lista no esta vacía, retrocede al anterior 
+            if (actual != null)
+            {
+                actual = actual.Anterior;
+            }
+            // Si la lista es circular, del primero pasa al ultimo 
             return actual;
         }
 

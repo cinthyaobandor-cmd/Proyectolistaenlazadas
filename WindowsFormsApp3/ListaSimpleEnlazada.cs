@@ -1,70 +1,157 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using WindowsFormsApp3;
 
-namespace WindowsFormsApp3
+namespace ListaEnlazadalimagenes
 {
-    internal class ListaSimpleEnlazada
+    public class ListaSimpleEnlazada
     {
-        private NodoImagen Cabeza { get; set; }
-        private NodoImagen actual; // Puntero de navegación
+        private NodoImagen cabeza;
+        private NodoImagen actual;
+        private int total;
+        private int indiceActual;
+
+        public int Total => total;
+        public int IndiceActual => indiceActual;
 
         public ListaSimpleEnlazada()
         {
-            Cabeza = null;
+            cabeza = null;
             actual = null;
+            total = 0;
+            indiceActual = 0;
         }
 
-        // 💡 Método para agregar una imagen a la lista
+        public bool EstaVacia()
+        {
+            return cabeza == null;
+        }
+
         public void AgregarImagen(string ruta)
         {
             NodoImagen nuevoNodo = new NodoImagen(ruta);
-            if (Cabeza == null)
+
+            if (cabeza == null)
             {
-                Cabeza = nuevoNodo;
-                actual = Cabeza; // El primer nodo es el actual
+                cabeza = nuevoNodo;
+                cabeza.Siguiente = cabeza; // Circular
+                actual = cabeza;
+                indiceActual = 1;
+            }
+            else
+            {
+                NodoImagen ultimo = cabeza;
+                while (ultimo.Siguiente != cabeza)
+                {
+                    ultimo = ultimo.Siguiente;
+                }
+                ultimo.Siguiente = nuevoNodo;
+                nuevoNodo.Siguiente = cabeza;
+            }
+            total++;
+        }
+
+        public Image ObtenerImagenActual()
+        {
+            if (actual != null)
+            {
+                return actual.Imagen;
+            }
+            return null;
+        }
+
+        public void ObtenerSiguienteImagen()
+        {
+            if (actual != null)
+            {
+                actual = actual.Siguiente;
+                indiceActual = (indiceActual % total) + 1;
+            }
+        }
+
+        public void ObtenerAnteriorImagen()
+        {
+            if (actual != null && cabeza != null)
+            {
+                NodoImagen temp = cabeza;
+                while (temp.Siguiente != actual)
+                {
+                    temp = temp.Siguiente;
+                }
+                actual = temp;
+                indiceActual = (indiceActual - 2 + total) % total + 1;
+            }
+        }
+
+        public void Reiniciar()
+        {
+            if (cabeza != null)
+            {
+                actual = cabeza;
+                indiceActual = 1;
+            }
+            else
+            {
+                indiceActual = 0;
+            }
+        }
+
+        public void EliminarActual()
+        {
+            if (cabeza == null) return;
+
+            if (cabeza.Siguiente == cabeza && total == 1)
+            {
+                cabeza = null;
+                actual = null;
+                total = 0;
+                indiceActual = 0;
                 return;
             }
 
-            NodoImagen temp = Cabeza;
-            while (temp.Siguiente != null)
+            NodoImagen anterior = cabeza;
+            while (anterior.Siguiente != actual)
             {
-                temp = temp.Siguiente;
-            }
-            temp.Siguiente = nuevoNodo;
-        }
-
-        // 💡 Método clave: Avanza al siguiente nodo y devuelve su imagen
-        public Image ObtenerSiguienteImagen()
-        {
-            if (actual == null)
-            {
-                return null; // Lista vacía
+                anterior = anterior.Siguiente;
             }
 
-            // Si hay un siguiente nodo, avanza el puntero 'actual'
-            if (actual.Siguiente != null)
+            if (actual == cabeza)
             {
-                actual = actual.Siguiente;
+                cabeza = cabeza.Siguiente;
             }
-            // Si no hay siguiente, se queda en el último nodo
 
-            return actual.Imagen;
+            anterior.Siguiente = actual.Siguiente;
+            actual = actual.Siguiente;
+            total--;
+
+            if (total > 0)
+            {
+                indiceActual = (indiceActual > total) ? 1 : indiceActual;
+            }
+            else
+            {
+                indiceActual = 0;
+            }
         }
 
-        // 💡 Método para obtener la imagen en la posición inicial
-        public Image ObtenerImagenActual()
+        public string[] ObtenerTodasLasRutas()
         {
-            return actual?.Imagen;
-        }
+            List<string> listaRutas = new List<string>();
 
-        // 💡 Método para resetear la posición 'actual'
-        public void Reiniciar()
-        {
-            actual = Cabeza;
+            if (cabeza == null) return listaRutas.ToArray();
+
+            NodoImagen nodoTemp = cabeza;
+            do
+            {
+                if (nodoTemp != null && !string.IsNullOrEmpty(nodoTemp.RutaArchivo))
+                {
+                    listaRutas.Add(nodoTemp.RutaArchivo);
+                }
+                nodoTemp = nodoTemp.Siguiente;
+            } while (nodoTemp != null && nodoTemp != cabeza);
+
+            return listaRutas.ToArray();
         }
     }
 }
